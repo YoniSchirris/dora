@@ -7,7 +7,6 @@ from langdetect import detect as languageDetector
 import csv
 import spacy
 
-#TODO Create cleaning for ` as spacy doesn't understand this
 
 class Dora:
 
@@ -16,9 +15,11 @@ class Dora:
         self.difficulty = difficulty
         self.new_lang = new_lang
         self.frequent_words = {}
+        self.swiper = Swiper()
 
         if self.source_is_supported(text_source):
             self.base_text = self.text_extractor(text_source)
+            self.base_text = self.swiper.sweep(self.base_text)
             self.interchanged_text = "Not yet set"
             self.base_lang = languageDetector(self.base_text)
             self.load_frequent_words()
@@ -86,6 +87,33 @@ class Dora:
             self.frequent_words[self.base_lang] = [row[0] for row in csv.reader(csvfile)]
         with open("../resources/frequent_words/words_" + self.new_lang + ".csv") as csvfile:
             self.frequent_words[self.new_lang] = [row[0] for row in csv.reader(csvfile)]
+
+
+#TODO Place Swiper in a separate python file and import
+class Swiper:
+    """
+    Swiper, go sweeping!
+    Swiper, go sweeping!!
+    Swiper, go sweeping!!!
+
+    And finally, swiper DOES sweep, and he sweeps the given string from its dirty characters
+    """
+
+    def __init__(self):
+        self.tit_for_tat = [
+            ["`", "'"]
+        ]
+
+    def sweep(self, dirty_text):
+        if type(dirty_text) == str:
+            clean_text = dirty_text
+
+            for replacements in self.tit_for_tat:
+                clean_text = clean_text.replace(replacements[0], replacements[1])
+            return clean_text
+        else:
+            print("Can only handle a pure string for now")
+            print("Please hand me a string)")
 
 
 if __name__ == "__main__":
